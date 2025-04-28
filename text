@@ -1,0 +1,139 @@
+
+1
+CREATE SCHEMA librarymanagement;
+CREATE TABLE authors (
+    author_id INT AUTO_INCREMENT PRIMARY KEY,
+    author_name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE genres (
+    genre_id INT AUTO_INCREMENT PRIMARY KEY,
+    genre_name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE books (
+    book_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    publication_year YEAR NOT NULL,
+    author_id INT,
+    genre_id INT,
+    FOREIGN KEY (author_id) REFERENCES authors(author_id),
+    FOREIGN KEY (genre_id) REFERENCES genres(genre_id)
+);
+
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE borrowed_books (
+    borrow_id INT AUTO_INCREMENT PRIMARY KEY,
+    book_id INT,
+    user_id INT,
+    borrow_date DATE NOT NULL,
+    return_date DATE,
+    FOREIGN KEY (book_id) REFERENCES books(book_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+2
+INSERT into authors (author_name)
+value ('JK Rowling');
+INSERT into genres (genre_name)
+value ('fantasy');
+INSERT into books (title, publication_year, author_id, genre_id)
+values ('Harry Potter', 1998, 1, 1);
+INSERT into users (username, email)
+values ('JK Rowling fan', 'hermione@gmail.com');
+INSERT into borrowed_books (book_id, user_id, borrow_date, return_date)
+values (1, 1, '2022-10-15', '2022-11-03')
+
+3 
+SELECT *
+FROM orders
+INNER JOIN customers ON orders.customer_id = customers.id
+INNER JOIN employees ON orders.employee_id = employees.employee_id
+INNER JOIN order_details ON orders.id = order_details.order_id
+INNER JOIN products ON order_details.product_id = products.id
+INNER JOIN suppliers ON products.supplier_id = suppliers.id
+INNER JOIN categories ON products.category_id = categories.id
+INNER JOIN shippers ON orders.shipper_id = shippers.id
+
+4.1 SELECT COUNT(*) as total_rows
+FROM orders
+INNER JOIN customers ON orders.customer_id = customers.id
+INNER JOIN employees ON orders.employee_id = employees.employee_id
+INNER JOIN order_details ON orders.id = order_details.order_id
+INNER JOIN products ON order_details.product_id = products.id
+INNER JOIN suppliers ON products.supplier_id = suppliers.id
+INNER JOIN categories ON products.category_id = categories.id
+INNER JOIN shippers ON orders.shipper_id = shippers.id
+
+4.2 Кількість строк не мінялася, коли я міняла INNER на RIGHT чи LEFT, оскільки всі таблиці заповнені та мають співпадіння в полях, за якими відбувається зєднання.
+
+4.3 
+SELECT orders.*
+FROM orders
+INNER JOIN customers ON orders.customer_id = customers.id
+INNER JOIN employees ON orders.employee_id = employees.employee_id
+INNER JOIN order_details ON orders.id = order_details.order_id
+INNER JOIN products ON order_details.product_id = products.id
+INNER JOIN suppliers ON products.supplier_id = suppliers.id
+INNER JOIN categories ON products.category_id = categories.id
+INNER JOIN shippers ON orders.shipper_id = shippers.id
+WHERE orders.employee_id > 3 AND orders.employee_id <= 10
+
+4.4 
+SELECT categories.name AS category_name, COUNT(*) AS number_of_rows, AVG(order_details.quantity) AS avg_quantity
+FROM orders
+INNER JOIN customers ON orders.customer_id = customers.id
+INNER JOIN employees ON orders.employee_id = employees.employee_id
+INNER JOIN order_details ON orders.id = order_details.order_id
+INNER JOIN products ON order_details.product_id = products.id
+INNER JOIN suppliers ON products.supplier_id = suppliers.id
+INNER JOIN categories ON products.category_id = categories.id
+INNER JOIN shippers ON orders.shipper_id = shippers.id
+GROUP BY categories.name
+
+4.5
+SELECT categories.name AS category_name, COUNT(*) AS number_of_rows, AVG(order_details.quantity) AS avg_quantity
+FROM orders
+INNER JOIN customers ON orders.customer_id = customers.id
+INNER JOIN employees ON orders.employee_id = employees.employee_id
+INNER JOIN order_details ON orders.id = order_details.order_id
+INNER JOIN products ON order_details.product_id = products.id
+INNER JOIN suppliers ON products.supplier_id = suppliers.id
+INNER JOIN categories ON products.category_id = categories.id
+INNER JOIN shippers ON orders.shipper_id = shippers.id
+GROUP BY categories.name
+HAVING avg_quantity > 21
+
+4.6
+SELECT categories.name AS category_name, COUNT(*) AS number_of_rows, AVG(order_details.quantity) AS avg_quantity
+FROM orders
+INNER JOIN customers ON orders.customer_id = customers.id
+INNER JOIN employees ON orders.employee_id = employees.employee_id
+INNER JOIN order_details ON orders.id = order_details.order_id
+INNER JOIN products ON order_details.product_id = products.id
+INNER JOIN suppliers ON products.supplier_id = suppliers.id
+INNER JOIN categories ON products.category_id = categories.id
+INNER JOIN shippers ON orders.shipper_id = shippers.id
+GROUP BY categories.name
+HAVING avg_quantity > 21
+ORDER BY number_of_rows DESC
+
+4.7
+SELECT categories.name AS category_name, COUNT(*) AS number_of_rows, AVG(order_details.quantity) AS avg_quantity
+FROM orders
+INNER JOIN customers ON orders.customer_id = customers.id
+INNER JOIN employees ON orders.employee_id = employees.employee_id
+INNER JOIN order_details ON orders.id = order_details.order_id
+INNER JOIN products ON order_details.product_id = products.id
+INNER JOIN suppliers ON products.supplier_id = suppliers.id
+INNER JOIN categories ON products.category_id = categories.id
+INNER JOIN shippers ON orders.shipper_id = shippers.id
+GROUP BY categories.name
+HAVING avg_quantity > 21
+ORDER BY number_of_rows DESC
+LIMIT 4
+OFFSET 1
